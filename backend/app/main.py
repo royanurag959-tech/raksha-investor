@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
@@ -126,17 +126,39 @@ def get_checklist():
         ]
     }
 
-# Check for production frontend build
-DIST_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
-if DIST_DIR.exists():
-    app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
+def get_dist_dir() -> Optional[Path]:
+    candidates = [
+        Path(__file__).resolve().parent.parent.parent / "frontend" / "dist",
+        Path(__file__).resolve().parent.parent / "frontend" / "dist",
+        Path.cwd() / "frontend" / "dist",
+        Path("/opt/render/project/src/frontend/dist"),
+        Path.cwd() / "dist",
+    ]
+    for p in candidates:
+        if p.exists() and (p / "index.html").exists():
+            return p
+    return None
 
-    @app.get("/{full_path:path}")
-    def serve_frontend(full_path: str):
-        # Do not catch /api paths
-        if full_path.startswith("api"):
-            raise HTTPException(status_code=404, detail="API route not found")
-        file_path = DIST_DIR / full_path
+# Attempt static mount
+current_dist = get_dist_dir()
+if current_dist and (current_dist / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=str(current_dist / "assets")), name="assets")
+
+@app.get("/")
+def serve_root():
+    dist = get_dist_dir()
+    if dist and (dist / "index.html").exists():
+        return FileResponse(dist / "index.html")
+    return HTMLResponse("<h2>Raksha Investor API is Online. Loading frontend...</h2><p>Visit <a href='/api/health'>/api/health</a> or <a href='/docs'>/docs</a></p>")
+
+@app.get("/{full_path:path}")
+def serve_frontend_catchall(full_path: str):
+    if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+        raise HTTPException(status_code=404, detail="API route not found")
+    dist = get_dist_dir()
+    if dist:
+        file_path = dist / full_path
         if file_path.is_file():
             return FileResponse(file_path)
-        return FileResponse(DIST_DIR / "index.html")
+        return FileResponse(dist / "index.html")
+    raise HTTPException(status_code=404, detail="Frontend assets not yet compiled")
