@@ -3,8 +3,12 @@
 
 [![Hackathon Track](https://img.shields.io/badge/SANGYAN%20Hackathon-Track%20A%3A%20Digital%20Fraud%20Resilience-amber?style=for-the-badge)](https://github.com)
 [![Public Good](https://img.shields.io/badge/Public%20Good-100%25%20Free%20%26%20Private-emerald?style=for-the-badge)](https://github.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Public%20Demo-ONLINE-success?style=for-the-badge)](https://considered-beverage-railroad-newcastle.trycloudflare.com)
 [![Bilingual](https://img.shields.io/badge/Languages-Hindi%20%7C%20English-blue?style=for-the-badge)](https://github.com)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
+
+> 🌐 **Live Public Deployment (Open on any Mobile or Laptop):**  
+> **[https://considered-beverage-railroad-newcastle.trycloudflare.com](https://considered-beverage-railroad-newcastle.trycloudflare.com)**
+
 
 ---
 
