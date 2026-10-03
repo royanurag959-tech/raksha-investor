@@ -1,7 +1,7 @@
 """
-Raksha Investor - Standalone Launcher
-Starts the FastAPI application which serves both the AI resilience backend and the built React frontend.
-Visit: http://localhost:8000
+Raksha Investor - Production & Standalone Launcher
+Supports local development and cloud platforms like Render, Railway, etc.
+Automatically binds to PORT environment variable and 0.0.0.0 in cloud environments.
 """
 
 import sys
@@ -23,11 +23,22 @@ sys.path.insert(0, str(backend_dir))
 import uvicorn
 
 if __name__ == "__main__":
+    # Render and cloud platforms supply PORT dynamically
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0"
+    is_dev = os.environ.get("ENV", "production").lower() == "development"
+
     print("=" * 60)
     print("[*] RAKSHA INVESTOR -- Check Before You Trust")
     print("[*] SANGYAN Hackathon - Track A: Digital Fraud & Scam Resilience")
     print("=" * 60)
-    print("[*] Starting server at: http://localhost:8000")
-    print("[*] API Documentation:  http://localhost:8000/docs")
+    print(f"[*] Starting server on {host}:{port}")
     print("=" * 60)
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True, app_dir=str(backend_dir))
+    
+    uvicorn.run(
+        "app.main:app", 
+        host=host, 
+        port=port, 
+        reload=is_dev, 
+        app_dir=str(backend_dir)
+    )
